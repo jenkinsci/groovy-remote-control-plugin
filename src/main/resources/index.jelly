@@ -1,0 +1,3 @@
+<div>
+  This plugin allows control jenkins via <a href="http://groovy.codehaus.org/modules/remote/">Groovy Remote Control</a>.
+</div>
