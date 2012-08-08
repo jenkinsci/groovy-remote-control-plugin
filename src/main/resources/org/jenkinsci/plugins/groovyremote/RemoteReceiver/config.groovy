@@ -1,8 +1,8 @@
 namespace(lib.FormTagLib).with {
-    entry(field:'name') {
+    entry(title:'Name', field:'name') {
         textbox()
     }
-    entry(field:'url') {
+    entry(title:'URL', field:'url') {
         textbox()
     }
     entry {
