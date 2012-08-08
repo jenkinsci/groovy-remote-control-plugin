@@ -19,9 +19,9 @@ class PluginSpec extends Specification {
     def 'run groovy script'() {
         given:
         def job = rule.createFreeStyleProject()
-        job.buildersList.add(new GroovyRemoteBuilder('''
+        job.buildersList.add newBuilder('''
             println 'hello'
-        '''))
+        ''')
 
         when:
         def build = job.scheduleBuild2(0).get()
@@ -33,9 +33,9 @@ class PluginSpec extends Specification {
     def 'use jenkins instance'() {
         given:
         def job = rule.createFreeStyleProject()
-        job.buildersList.add(new GroovyRemoteBuilder('''
+        job.buildersList.add newBuilder('''
             println "Jenkins Version: ${jenkins.version}"
-        '''))
+        ''')
 
         when:
         def build = job.scheduleBuild2(0).get()
@@ -48,15 +48,13 @@ class PluginSpec extends Specification {
         given:
         createServer()
         def job = rule.createFreeStyleProject()
-        def builder = new GroovyRemoteBuilder('test', '''
+        job.buildersList.add newBuilder('''
             println "Jenkins Version: ${jenkins.version}"
             def result = remote {
                 1 + 1
             }
             println "Remote result: ${result}"
         ''')
-        builder.descriptor.remotes << createRemoteReceiver()
-        job.buildersList.add(builder)
 
         when:
         def build = job.scheduleBuild2(0).get()
@@ -66,8 +64,14 @@ class PluginSpec extends Specification {
         build.logFile.text.contains("Remote result: 2")
     }
 
+    private newBuilder(String script) {
+        def builder = new GroovyRemoteBuilder('test', script)
+        builder.descriptor.remotes << createRemoteReceiver()
+        builder
+    }
+
     private createRemoteReceiver() {
-        new RemoteReceiver('test', "http://localhost:${server.address.port}")
+        new RemoteReceiver('test', "http://localhost:${server?.address?.port}")
     }
 
     private createServer() {
