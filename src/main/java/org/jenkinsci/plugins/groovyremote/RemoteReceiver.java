@@ -3,8 +3,14 @@ package org.jenkinsci.plugins.groovyremote;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
-
+import hudson.util.FormValidation;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import static hudson.util.FormValidation.validateRequired;
 
 public class RemoteReceiver extends AbstractDescribableImpl<RemoteReceiver> {
 
@@ -40,6 +46,19 @@ public class RemoteReceiver extends AbstractDescribableImpl<RemoteReceiver> {
         @Override
         public String getDisplayName() {
             return "Remote Receiver";
+        }
+
+        public FormValidation doCheckName(@QueryParameter String value) {
+            return validateRequired(value);
+        }
+
+        public FormValidation doCheckUrl(@QueryParameter String value) {
+            try {
+                new URL(value);
+                return FormValidation.ok();
+            } catch (MalformedURLException e) {
+                return FormValidation.error(Messages.RemoteReceiver_malformed_url());
+            }
         }
     }
 }

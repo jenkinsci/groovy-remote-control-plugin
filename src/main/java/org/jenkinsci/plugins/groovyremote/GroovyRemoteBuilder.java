@@ -15,6 +15,7 @@ import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.Descriptor;
 import hudson.tasks.Builder;
+import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
 import java.io.IOException;
@@ -33,6 +34,7 @@ import org.codehaus.groovy.control.CompilationFailedException;
 import org.codehaus.groovy.control.CompilationUnit;
 import org.codehaus.groovy.control.SourceUnit;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 public class GroovyRemoteBuilder extends Builder {
@@ -129,10 +131,15 @@ public class GroovyRemoteBuilder extends Builder {
 
         public ListBoxModel doFillRemoteNameItems() {
             ListBoxModel m = new ListBoxModel();
+            m.add("");
             for (RemoteReceiver remote : remotes) {
                 m.add(remote.getName());
             }
             return m;
+        }
+
+        public FormValidation doCheckRemoteName(@QueryParameter String value) {
+            return FormValidation.validateRequired(value);
         }
     }
 

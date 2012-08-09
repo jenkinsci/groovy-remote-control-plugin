@@ -12,6 +12,7 @@ buildscript {
 }
 
 apply plugin: 'jpi'
+apply plugin: 'idea'
 
 repositories {
     mavenCentral()
@@ -21,6 +22,7 @@ dependencies {
     groovy 'org.codehaus.groovy:groovy-all:1.8.6'
     compile 'org.codehaus.groovy.modules.remote:remote-transport-local:0.3'
     compile 'org.codehaus.groovy.modules.remote:remote-transport-http:0.3'
+    compile 'commons-validator:commons-validator:1.4.0'
     testCompile 'org.spockframework:spock-core:0.6-groovy-1.8'
     jenkinsTest('org.jenkins-ci.plugins:ant:1.1@jar',
                 'org.jenkins-ci.plugins:javadoc:1.0@jar')
