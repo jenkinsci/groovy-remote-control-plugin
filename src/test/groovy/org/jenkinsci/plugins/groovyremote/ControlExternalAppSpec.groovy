@@ -9,7 +9,7 @@ import groovyx.remote.transport.http.*
 import com.sun.net.httpserver.HttpServer
 import java.util.concurrent.Executors
 
-class PluginSpec extends Specification {
+class ControlExternalAppSpec extends Specification {
 
     @Rule
     JenkinsRule rule = new JenkinsRule()
