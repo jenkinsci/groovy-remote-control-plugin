@@ -19,6 +19,7 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -76,7 +77,7 @@ public class GroovyRemoteBuilder extends Builder {
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         BytesCashedGroovyClassLoader cl = new BytesCashedGroovyClassLoader();
-        HttpTransport transport = new HttpTransport(getRemote().getUrl());
+        HttpTransport transport = new AppTransport(getRemote());
         RemoteControl remote = new AppRemoteControl(transport, cl);
         Binding binding = new Binding();
         binding.setProperty("out", listener.getLogger());
@@ -143,6 +144,24 @@ public class GroovyRemoteBuilder extends Builder {
         }
     }
 
+    private static class AppTransport extends HttpTransport {
+
+        private RemoteReceiver receiver;
+
+        public AppTransport(RemoteReceiver receiver) {
+            super(receiver.getUrl());
+            this.receiver = receiver;
+        }
+
+        @Override
+        protected Object configureConnection(HttpURLConnection connection) {
+            for (Header header : receiver.getHeaders()) {
+                connection.addRequestProperty(header.getKey(), header.getValue());
+            }
+            return connection;
+        }
+    }
+
     private static class AppRemoteControl extends RemoteControl {
         public AppRemoteControl(Transport transport, BytesCashedGroovyClassLoader classLoader) {
             super(transport, new RemoteCommandGenerator(classLoader));
@@ -196,5 +215,7 @@ public class GroovyRemoteBuilder extends Builder {
             }
             return classBytes;
         }
+
+
     }
 }

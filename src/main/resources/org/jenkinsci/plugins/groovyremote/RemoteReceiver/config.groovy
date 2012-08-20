@@ -10,4 +10,9 @@ namespace(lib.FormTagLib).with {
             repeatableDeleteButton()
         }
     }
+    section(title:'Headers') {
+        entry(title:'Header') {
+            repeatableProperty(field:'headers')
+        }
+    }
 }
