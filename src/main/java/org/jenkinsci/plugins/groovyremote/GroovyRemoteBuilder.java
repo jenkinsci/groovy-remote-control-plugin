@@ -155,8 +155,11 @@ public class GroovyRemoteBuilder extends Builder {
 
         @Override
         protected Object configureConnection(HttpURLConnection connection) {
-            for (Header header : receiver.getHeaders()) {
-                connection.addRequestProperty(header.getKey(), header.getValue());
+            List<Header> headers = receiver.getHeaders();
+            if (headers != null) {
+                for (Header h : headers) {
+                    connection.addRequestProperty(h.getKey(), h.getValue());
+                }
             }
             return connection;
         }
