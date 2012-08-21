@@ -11,6 +11,7 @@ import groovyx.remote.transport.http.HttpTransport;
 import hudson.CopyOnWrite;
 import hudson.Extension;
 import hudson.Launcher;
+import hudson.ProxyConfiguration;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.Descriptor;
@@ -20,6 +21,7 @@ import hudson.util.ListBoxModel;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -151,6 +153,15 @@ public class GroovyRemoteBuilder extends Builder {
         public AppTransport(RemoteReceiver receiver) {
             super(receiver.getUrl());
             this.receiver = receiver;
+        }
+
+        @Override
+        protected HttpURLConnection openConnection() {
+            try {
+                return (HttpURLConnection) ProxyConfiguration.open(new URL(receiver.getUrl()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         @Override
