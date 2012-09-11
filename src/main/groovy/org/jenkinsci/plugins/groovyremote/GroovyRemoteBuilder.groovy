@@ -54,7 +54,7 @@ public class GroovyRemoteBuilder extends Builder {
             s.binding = new Binding(out:listener.logger, jenkins:Jenkins.instance, remote:remote)
             s.run()
         } catch (e) {
-            listener.error(e.message)
+            e.printStackTrace(listener.logger)
             return false
         }
         true
