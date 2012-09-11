@@ -180,6 +180,15 @@ public class GroovyRemoteBuilder extends Builder {
             classBytes
         }
 
-
+        @Override
+        protected List<byte[]> getSupportingClassesBytes(Class closureClass) {
+            def className = closureClass.name
+            classLoader.classCollector.cache.inject([]) { classes, entry ->
+                if (entry.key != className && entry.key.startsWith(className)) {
+                    classes << entry.value
+                }
+                classes
+            }
+        }
     }
 }

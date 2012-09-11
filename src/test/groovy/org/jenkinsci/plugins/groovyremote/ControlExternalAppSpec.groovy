@@ -86,6 +86,46 @@ class ControlExternalAppSpec extends Specification {
         build.logFile.text.contains("Hello, World!")
     }
 
+    def 'use closure in remote'() {
+        given:
+        createServer()
+        def job = rule.createFreeStyleProject()
+        job.buildersList.add newBuilder('''
+            def result = remote {
+                def c =  {
+                    acc, val -> acc += val
+                }
+                ['W', 'o', 'r', 'l', 'd'].inject('', c)
+            }
+            println "Hello, ${result}!"
+        ''')
+
+        when:
+        def build = job.scheduleBuild2(0).get()
+
+        then:
+        build.logFile.text.contains("Hello, World!")
+    }
+
+    def 'use method closure in remote'() {
+        given:
+        createServer()
+        def job = rule.createFreeStyleProject()
+        job.buildersList.add newBuilder('''
+            def date = Date.&parse
+            def result = remote {
+                date('yyyyMMdd', '20120911')
+            }
+            println result.format('yyyy-MM-dd')
+        ''')
+
+        when:
+        def build = job.scheduleBuild2(0).get()
+
+        then:
+        build.logFile.text.contains("2012-09-11")
+    }
+
     private newBuilder(String script) {
         def builder = new GroovyRemoteBuilder('test', script)
         builder.descriptor.remotes << createRemoteReceiver()
