@@ -47,7 +47,7 @@ public class GroovyRemoteBuilder extends Builder {
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-        def cl = new BytesCashedGroovyClassLoader()
+        def cl = new BytesCachedGroovyClassLoader()
         def remote = new AppRemoteControl(new AppTransport(getRemote()), cl)
         try {
             def s = cl.parseClass(script).newInstance()
@@ -131,16 +131,16 @@ public class GroovyRemoteBuilder extends Builder {
     }
 
     static class AppRemoteControl extends RemoteControl {
-        public AppRemoteControl(Transport transport, BytesCashedGroovyClassLoader classLoader) {
+        public AppRemoteControl(Transport transport, BytesCachedGroovyClassLoader classLoader) {
             super(transport, new RemoteCommandGenerator(classLoader))
         }
     }
 
-    static class BytesCashedClassCollector extends GroovyClassLoader.ClassCollector {
+    static class BytesCachedClassCollector extends GroovyClassLoader.ClassCollector {
 
         def cache = [:]
 
-        protected BytesCashedClassCollector(GroovyClassLoader.InnerLoader cl, CompilationUnit unit, SourceUnit su) {
+        protected BytesCachedClassCollector(GroovyClassLoader.InnerLoader cl, CompilationUnit unit, SourceUnit su) {
             super(cl, unit, su)
         }
 
@@ -152,23 +152,23 @@ public class GroovyRemoteBuilder extends Builder {
         }
     }
 
-    private static class BytesCashedGroovyClassLoader extends GroovyClassLoader {
+    private static class BytesCachedGroovyClassLoader extends GroovyClassLoader {
 
         def classCollector;
 
         protected GroovyClassLoader.ClassCollector createCollector(CompilationUnit unit, SourceUnit su) {
             GroovyClassLoader.InnerLoader loader = AccessController.doPrivileged(new PrivilegedAction<GroovyClassLoader.InnerLoader>() {
                 public GroovyClassLoader.InnerLoader run() {
-                    return new GroovyClassLoader.InnerLoader(BytesCashedGroovyClassLoader.this)
+                    return new GroovyClassLoader.InnerLoader(BytesCachedGroovyClassLoader.this)
                 }
             });
-            classCollector = new BytesCashedClassCollector(loader, unit, su)
+            classCollector = new BytesCachedClassCollector(loader, unit, su)
         }
     }
 
     private static class RemoteCommandGenerator extends CommandGenerator {
 
-        public RemoteCommandGenerator(BytesCashedGroovyClassLoader cl) {
+        public RemoteCommandGenerator(BytesCachedGroovyClassLoader cl) {
             super(cl)
         }
 
