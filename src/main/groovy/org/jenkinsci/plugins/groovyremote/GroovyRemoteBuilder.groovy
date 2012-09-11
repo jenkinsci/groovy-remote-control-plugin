@@ -28,19 +28,19 @@ import org.kohsuke.stapler.StaplerRequest
 
 public class GroovyRemoteBuilder extends Builder {
 
-    String remoteName;
-    String script;
+    String remoteName
+    String script
 
     @DataBoundConstructor
     public GroovyRemoteBuilder(String remoteName, String script) {
-        this.remoteName = remoteName;
-        this.script = script;
+        this.remoteName = remoteName
+        this.script = script
     }
 
     protected RemoteReceiver getRemote() {
         def remote = getDescriptor().remotes.find { it.name == remoteName }
         if (!remote) {
-            throw new RuntimeException("No such remote receiver. [" + remoteName + "]")
+            throw new RuntimeException("No such remote receiver. [${remoteName}]")
         }
         remote
     }
@@ -92,7 +92,7 @@ public class GroovyRemoteBuilder extends Builder {
 
         public ListBoxModel doFillRemoteNameItems() {
             def model = new ListBoxModel()
-            model.add("")
+            model.add ""
             remotes.inject(model) { m, r ->
                 m.add r.name
             }
@@ -145,14 +145,13 @@ public class GroovyRemoteBuilder extends Builder {
         }
 
         @Override
-        @SuppressWarnings("rawtypes")
         protected Class createClass(byte[] code, ClassNode classNode) {
             cache[classNode.name] = code
             return super.createClass(code, classNode)
         }
     }
 
-    private static class BytesCachedGroovyClassLoader extends GroovyClassLoader {
+    static class BytesCachedGroovyClassLoader extends GroovyClassLoader {
 
         def classCollector;
 
@@ -166,13 +165,13 @@ public class GroovyRemoteBuilder extends Builder {
         }
     }
 
-    private static class RemoteCommandGenerator extends CommandGenerator {
+    static class RemoteCommandGenerator extends CommandGenerator {
 
         public RemoteCommandGenerator(BytesCachedGroovyClassLoader cl) {
             super(cl)
         }
 
-        protected byte[] getClassBytes(@SuppressWarnings("rawtypes") Class closureClass) {
+        protected byte[] getClassBytes(Class closureClass) {
             def classBytes = classLoader.classCollector.cache[closureClass.name]
             if (classBytes == null) {
                 throw new IllegalStateException("Could not find class file for class [${closureClass.name}]");
